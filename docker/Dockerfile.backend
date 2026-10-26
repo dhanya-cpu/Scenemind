@@ -1,0 +1,30 @@
+FROM python:3.11-slim-bookworm
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libgl1-mesa-glx \
+    libglib2.0-0 \
+    libsm6 \
+    libxext6 \
+    libxrender-dev \
+    ffmpeg \
+    espeak-ng \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY pyproject.toml .
+RUN pip install --no-cache-dir -e .
+
+COPY backend/ ./backend/
+COPY vision/ ./vision/
+COPY voice/ ./voice/
+COPY reasoning/ ./reasoning/
+COPY navigation/ ./navigation/
+COPY mapping/ ./mapping/
+COPY analytics/ ./analytics/
+COPY digital_twin/ ./digital_twin/
+COPY robot/ ./robot/
+
+EXPOSE 8000
+
+CMD ["uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "8000"]
